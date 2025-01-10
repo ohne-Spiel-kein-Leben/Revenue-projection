@@ -8,6 +8,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import xlwings as xw
 
+# 常量定义
+RETAIN_COLUMNS = ['次留', '3留', '7留', '14留', '30留']
+FEATURES = ['留存降幅', '次留', '3留', '7留', '14留', '30留', 'ARPU', '模拟每日活跃人数']
 
 
 class PredictionApp:
@@ -40,5 +43,11 @@ def predict(self):
             messagebox.showwarning("警告", "请先导入数据文件!")
             return
     
-        # 数据处理
+        self.preprocess_data()
+        features = self.data[FEATURES]
+        target = self.data['充值金额']
         
+        X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
+        
+        model = xgb.XGBRegressor(objective='reg:squarederror')
+        model.fit(X_train, y_train)
